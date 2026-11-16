@@ -19,7 +19,6 @@ defineAsset('maquinaEspresso', {
   pins: { grupo: { p: [3, 0, 21] } },
   floorShadow: (xf) => [boxCorners(xf, [-16, -12, 0], [-2, 12, 30]), boxCorners(xf, [-2, -10, 0], [10, 10, 1.6])],
   draw(G, xf, st) {
-    const bar = st.bar || 0;
     // body
     drawBox(G, xf, [-16, -12, 0], [-2, 12, 30], MC.body, {
       lw: 2,
@@ -34,6 +33,16 @@ defineAsset('maquinaEspresso', {
     drawBox(G, xf, [-2, -10, 0], [10, 10, 1.6], MC.tray, {
       lw: 1.8, top: (c) => { c.strokeStyle = 'rgba(255,255,255,0.22)'; c.lineWidth = 0.12; for (let x = 0.8; x < 12; x += 1.2) { c.beginPath(); c.moveTo(x, 0.8); c.lineTo(x, 19.2); c.stroke(); } },
     });
+    // group head
+    drawCyl(G, xf, ES_GEO.group, 'z', 3.8, 3, M.steel, { seg: 36, lw: 1.6 });
+  },
+});
+
+defineAsset('cabezalEspresso', {
+  name: 'cabezal y manómetro', label: 'MANÓMETRO', group: 'floor', layer: 4, O: [0, 0, 0], anchor: [8, 4.8, 27], ring: [6, 9, 24], lab: [5, 3, 4.5], dropH: 5,
+  floorShadow: (xf) => [boxCorners(xf, [-2, -9, 24], [8, 9, 30])],
+  draw(G, xf, st) {
+    const bar = st.bar || 0;
     // head housing with the pressure gauge on its front face
     drawBox(G, xf, [-2, -9, 24], [8, 9, 30], MC.body, {
       lw: 2,
@@ -52,8 +61,6 @@ defineAsset('maquinaEspresso', {
         ptxt(c, `${bar.toFixed(1)} bar`, 8.2, 3.9, 0.7, bar >= 8 ? '#2f8a2f' : 'rgba(29,32,51,0.6)', 700, 'left');
       },
     });
-    // group head
-    drawCyl(G, xf, ES_GEO.group, 'z', 3.8, 3, M.steel, { seg: 36, lw: 1.6 });
     // steam wand on the right side
     drawWire(G, xf, [[5, 8.6, 24.2], [6.6, 9.8, 22.6], [7.4, 10.4, 19.5], [7.6, 10.6, 16.5]], '#e3e7ee', { w: 0.7, n: 14 });
     drawCyl(G, xf, [7.6, 10.6, 16.1], 'z', 0.42, 0.8, M.steel, { seg: 14, lw: 1.2 });
@@ -61,7 +68,7 @@ defineAsset('maquinaEspresso', {
 });
 
 defineAsset('portafiltro', {
-  name: 'portafiltro', label: 'PORTAFILTRO · 18 g', group: 'floor', layer: 2, O: [0, 0, 0], anchor: [3, 0, 21], ring: [4.5, 4.5, 18.2], lab: [2, -2, 2.5], dropH: 5,
+  name: 'portafiltro', label: 'PORTAFILTRO · 18 g', group: 'floor', layer: 2, O: [0, 0, 0], anchor: [3, 0, 21], ring: [4.5, 4.5, 18.2], lab: [9, -9, -2], dropH: 5,
   draw(G, xf, st) {
     for (const s of [-1, 1]) drawCyl(G, xf, [3, s * ES_GEO.spoutY, 17.55], 'z', 0.45, 1.3, M.steel, { seg: 14, lw: 1.2 });
     drawCyl(G, xf, ES_GEO.basket, 'z', 3.6, 2.8, M.steel, { seg: 36, lw: 1.7 });
@@ -71,7 +78,7 @@ defineAsset('portafiltro', {
 });
 
 defineAsset('bascula', {
-  name: 'báscula', label: 'BÁSCULA · 0.1 g', group: 'floor', layer: 1, O: [0, 0, 0], anchor: [3, 0, 3.4], ring: [4.4, 4.4, 1.62], lab: [2.5, 2.5, 1.5], dropH: 6,
+  name: 'báscula', label: 'BÁSCULA · 0.1 g', group: 'floor', layer: 1, O: [0, 0, 0], anchor: [3, 0, 3.4], ring: [4.4, 4.4, 1.62], lab: [6, -3, -1.5], dropH: 6,
   draw(G, xf, st) {
     const g = st.grams || 0, tm = st.shotT || 0;
     drawBox(G, xf, [-0.8, -3.9, 1.6], [6.8, 3.9, 3.4], M.blk, {
@@ -86,7 +93,7 @@ defineAsset('bascula', {
 });
 
 defineAsset('tazaEspresso', {
-  name: 'taza de espresso', label: 'TAZA', group: 'floor', layer: 3, O: [0, 0, 0], anchor: [3, 0, 8.4], ring: [3.4, 3.4, 3.42], lab: [2.6, 2.6, 1.6], dropH: 6,
+  name: 'taza de espresso', label: 'TAZA', group: 'floor', layer: 3, O: [0, 0, 0], anchor: [3, 0, 8.4], ring: [3.4, 3.4, 3.42], lab: [-1, 7, 2.5], dropH: 6,
   draw(G, xf, st) {
     const g = ES_GEO, fill = clamp((st.grams || 0) / 40), q = st.flowCol ?? 1.6;
     drawWire(G, xf, [[3, 2.6, 7.6], [3, 4.1, 7.2], [3, 4.2, 5.4], [3, 2.3, 5.0]], '#f4f6f9', { w: 0.7, n: 14 });
@@ -109,6 +116,11 @@ function drawChorros(G, base, q, on, t) {
   const g = ES_GEO, col = cafeColor(q), w = clamp(0.12 + q * 0.09, 0.14, 0.42) * on;
   for (const s of [-1, 1]) {
     const top = [3, s * g.spoutY, g.spoutZ], bot = [3, s * g.spoutY * 0.55, g.cupBase + g.cupH - 0.3];
+    if (q < 1.0) {   // choked puck: it drips instead of pouring
+      const c = G.ctx; c.save(); c.fillStyle = col; c.globalAlpha = on;
+      for (let k = 0; k < 3; k++) { const f = ((t * (0.9 + q) + k / 3 + (s > 0 ? 0.17 : 0)) % 1 + 1) % 1, P = G.cam.p(base.p(lerp3(top, bot, f * f))); c.beginPath(); c.ellipse(P[0], P[1], 0.16 * G.cam.z, 0.24 * G.cam.z, 0, 0, Math.PI * 2); c.fill(); }
+      c.restore(); continue;
+    }
     const wob = Math.sin(t * 9 + s) * 0.06;
     drawWire(G, base, [top, [3 + wob, s * g.spoutY * 0.85, (top[2] + bot[2]) / 2], bot], col, { w, n: 10 });
   }

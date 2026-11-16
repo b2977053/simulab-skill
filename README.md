@@ -66,7 +66,7 @@ Todo el detalle está en [SKILL.md](SKILL.md). / The full detail is in [SKILL.md
 | `SKILL.md` | Lo que lee Claude: el método, el contrato de cada lab, la revisión. / What Claude reads: the method, the lab contract, the review. |
 | `PROMPTS.md` | Prompts en español e inglés y una tabla de ideas por nicho. / Prompts in Spanish and English and a table of ideas by niche. |
 | `kit/` | Motor isométrico, interfaz, reproductor e idiomas. / Isometric engine, UI, player and languages. |
-| `assets/` | 43 objetos reutilizables (placas, herramientas, café...). Lista en `CATALOGO.md`. / 43 reusable objects (boards, tools, coffee...). List in `CATALOGO.md`. |
+| `assets/` | 44 objetos reutilizables (placas, herramientas, café...). Lista en `CATALOGO.md`. / 44 reusable objects (boards, tools, coffee...). List in `CATALOGO.md`. |
 | `demos/` | 5 labs completos y el catálogo. / 5 complete labs and the catalogue. |
 | `tools/` | Build, hojas de contacto, video, audio, portada. / Build, contact sheets, video, audio, cover. |
 

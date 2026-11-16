@@ -30,6 +30,6 @@ function esAt(g, tm) {
   let bar = 0;
   if (tm >= 0 && tm < T) bar = tm < ES.preT ? ES.preBar * smooth(tm / 1.2) : lerp(ES.preBar, ES.bar, smooth((tm - ES.preT) / 0.8));
   else if (tm >= T) bar = ES.bar * (1 - smooth((tm - T) / 0.6));
-  const flowing = on && tm > ES.preT + 0.3 ? 1 : 0;
-  return { g, Q, T, grams, bar, pump: on ? 1 : 0, flowing, done: tm >= T, shotT: clamp(tm, 0, T), res: esVeredicto(T) };
+  const flowing = on && tm > ES.preT ? 1 : 0;
+  return { g, Q, T, grams, choked: tm >= T && grams < ES.target - 0.05, pre: on && tm < ES.preT, bar, pump: on ? 1 : 0, flowing, done: tm >= T, shotT: clamp(tm, 0, T), res: esVeredicto(T) };
 }

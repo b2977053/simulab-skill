@@ -12,6 +12,7 @@ const EC_LEAD = 1.0, EC_HOLD = 2.8, EC_LIVE_RATE = 2;
 function ecInsts() {
   return [
     place('maquinaEspresso', 'maq', { code: "maquina('ES-01', 9 /* bar */);" }),
+    place('cabezalEspresso', 'cab', { code: 'manometro(15 /* bar */);' }),
     place('bascula', 'bas', { code: 'bascula(0.1 /* g */);' }),
     place('tazaEspresso', 'taza', { code: 'taza();' }),
     place('portafiltro', 'pf', { code: 'portafiltro(18 /* g */);' }),
@@ -33,7 +34,7 @@ function ecChapter(TL, t) { for (let k = TL.CH.length - 1; k >= 0; k--) if (t >=
 // live: every press of P is a shot with the grind set at that moment
 function ecLiveShots(params) {
   const out = []; let prev = 0;
-  for (const e of LIVE.ev) if (e[1] === 'shot' && e[2] === 1 && e[0] >= prev) { out.push({ tp: e[0], g: liveVal(LIVE.ev, 'grind', e[0], params.grind ?? 5) }); prev = e[0] + 0.01; }
+  for (const e of LIVE.ev) if (e[1] === 'shot' && e[2] === 1 && e[0] >= prev) { const g = liveVal(LIVE.ev, 'grind', e[0], params.grind ?? 5); out.push({ tp: e[0], g }); prev = e[0] + esT(g) / EC_LIVE_RATE + 0.3; }
   return out;
 }
 
@@ -69,7 +70,7 @@ const DEMO = {
   chips: ['MÁQUINA 9 BAR · 18 g → 36 g · BÁSCULA 0.1 g', 'LAB E1 · CAFÉ'],
   caption: 'La molienda decide cuánto tarda el agua.',
   intro: { seconds: 5, lines: ['¿Por qué tu espresso', 'sale agrio o amargo?'], pill: 'LAB E1 · ESPRESSO', src: (TL) => TL.T.caption, rate: 0.8 },
-  major: ['maq', 'pf', 'bas', 'taza'],
+  major: ['maq', 'cab', 'pf'],
   params: { grind: 5 },
   knob: { key: 'grind', label: 'MOLIENDA', min: 1, max: 10, step: 1, fmt: (v) => `${v} · ${esD(v)} µm` },
   live: { label: '▶ Saca tu shot', controls: [{ key: 'shot', label: 'SACAR SHOT', keys: ['KeyP'], kbd: 'P' }] },
@@ -94,7 +95,7 @@ const DEMO = {
     const cap = !TL.live && st.t >= TL.T.caption - 0.3;
     if (ch && !cap) {
       const endV = EC_LEAD + ch.vid, dur = ch.t1 - ch.t0;
-      callout(c, P([8, -4.2, 28.2]), 150, -70, `PRESIÓN · ${ES.bar} BAR`, fade(EC_LEAD + 0.4, EC_LEAD + 2.6));
+      if (sh && sh.pump) callout(c, P([8, 4.8, 27]), 190, -90, sh.pre ? `PREINFUSIÓN · ${ES.preBar} BAR` : `EXTRACCIÓN · ${ES.bar} BAR`, fade(EC_LEAD + 0.3, EC_LEAD + ES.preT / ch.rate + 2.2), sh.pre ? '#ffffff' : '#c8f04a');
       const mid = [3, 0.6, 12.5];
       if (ch.id === 'grueso') callout(c, P(mid), 210, -20, 'SALE RÁPIDO Y CLARO', fade(EC_LEAD + 2.0, endV), '#ffcf6b');
       if (ch.id === 'fino') callout(c, P(mid), 210, -20, 'GOTEA LENTO Y OSCURO', fade(EC_LEAD + 2.6, endV), '#ffcf6b');
@@ -112,7 +113,11 @@ const DEMO = {
         pill(c, CARD.x + 30, 150 + i * 46, `${i + 1} · MOLIENDA ${cc.g} · ${Math.round(cc.Tshot)} s · ${r[1]}`, { bg: r[3] === 'lime' ? '#c8f04a' : r[3] === 'amber' ? '#ffcf6b' : '#ff9e93', size: 14, padY: 9, alpha: a * seg(st.t, TL.T.caption + 0.5 + i * 0.15, TL.T.caption + 0.8 + i * 0.15) });
       });
     }
-    if (TL.live) tipCard(c, CARD.x + 30, 146, ['Gira la MOLIENDA y presiona P.', 'Busca 36 g en 25-30 s.'], 1, 'TU TURNO');
+    if (TL.live) {
+      const run = sh && !sh.done;
+      tipCard(c, CARD.x + 30, 146, run ? [`Molienda ${sh.g}: ${sh.pre ? 'preinfusión…' : 'extrayendo…'}`, 'Espera a que termine el shot.'] : ['Gira la MOLIENDA y presiona P.', 'Busca 36 g en 25-30 s.'], 1, 'TU TURNO');
+      if (sh && sh.done) callout(c, P([3, 0, 8.6]), -260, -40, sh.choked ? `AHOGADO · ${sh.grams.toFixed(0)} g EN 60 s` : `${Math.round(sh.T)} s · ${sh.res[1]}`, 1, sh.res[3] === 'lime' ? '#c8f04a' : sh.res[3] === 'amber' ? '#ffcf6b' : '#ff9e93');
+    }
   },
   drawBays(c, TL, st) {
     const sh = st.shot, tm = sh ? sh.shotT : 0;
@@ -131,7 +136,7 @@ const DEMO = {
     c.restore();
     // BAY 02 · grams in the cup
     const g = st.grams;
-    b = bayFrame(c, 1, 'BAY 02 · EN LA TAZA', g >= ES.target - 0.05 ? 'LISTO' : sh && sh.flowing ? 'CAYENDO' : '--', g >= ES.target - 0.05 ? BAY_BG.lime : sh && sh.flowing ? BAY_BG.amber : BAY_BG.grey);
+    b = bayFrame(c, 1, 'BAY 02 · EN LA TAZA', sh && sh.choked ? 'AHOGADO' : g >= ES.target - 0.05 ? 'LISTO' : sh && sh.flowing ? 'CAYENDO' : sh && sh.pre ? 'PREINFUSIÓN' : '--', sh && sh.choked ? BAY_BG.coral : g >= ES.target - 0.05 ? BAY_BG.lime : sh && (sh.flowing || sh.pre) ? BAY_BG.amber : BAY_BG.grey);
     bigValue(c, b, g.toFixed(1), `/ ${ES.target} g`, `${ES.dose} g de café → ${ES.target} g (1:2)`);
     c.save();
     const gx = b.x + 14, gw = b.w - 28, gy = b.y + 132;
@@ -140,14 +145,14 @@ const DEMO = {
     c.font = `400 11px ${FONT_MONO}`; c.fillStyle = '#6b6f7a'; c.fillText(sh ? `presión ${sh.bar.toFixed(1)} bar · bomba ${sh.pump ? 'ON' : 'OFF'}` : 'presión 0 bar', gx, gy + 44);
     c.restore();
     // BAY 03 · grind and flow
-    const gr = sh ? sh.g : TL.live ? st.grindNow : 5, d = esD(gr), q = esQ(gr);
+    const gr = TL.live ? (sh && !sh.done ? sh.g : st.grindNow) : sh ? sh.g : 5, d = esD(gr), q = esQ(gr);
     b = bayFrame(c, 2, 'BAY 03 · MOLIENDA', gr <= 3 ? 'FINA' : gr >= 7 ? 'GRUESA' : 'MEDIA', gr <= 3 ? BAY_BG.coral : gr >= 7 ? BAY_BG.amber : BAY_BG.lime);
     bigValue(c, b, q.toFixed(2), 'g/s', `ajuste ${gr} · partícula ${d} µm`);
     chartBox(c, b);
     c.save(); c.fillStyle = cafeColor(q);
     const rpx = 1.5 + (d / 600) * 6.5;
     for (let i = 0; i < 40; i++) { const x = b.cx + 10 + ((i * 37) % (b.cw - 20)), y = b.cy + 10 + ((i * 53) % (b.ch - 20)); c.beginPath(); c.arc(x, y, rpx * (0.8 + ((i * 7) % 5) / 10), 0, Math.PI * 2); c.fill(); }
-    c.font = `700 9.5px ${FONT_MONO}`; c.fillStyle = '#545867'; c.fillText('flujo ∝ partícula²', b.cx + 4, b.cy + b.ch + 16);
+    c.restore(); c.save(); pill(c, b.cx + b.cw - 6, b.cy + 6, 'flujo ∝ partícula²', { align: 'right', bg: '#fffdf8', size: 9, padY: 3, padX: 6, ls: 0.5, shadow: false, lw: 1 });
     c.restore();
     // BAY 04 · results so far
     const last = st.tally.length ? st.tally[st.tally.length - 1] : null, lr = last && last.done ? esVeredicto(last.T) : null;

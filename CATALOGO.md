@@ -155,7 +155,8 @@ resolveCables(insts)   // calcula la ruta de cada cable (arco + conectores dupon
 
 | type | nombre | grupo | pines | opts / st que lee |
 |---|---|---|---|---|
-| `maquinaEspresso` | máquina de espresso | floor | grupo | st.bar, st.pump |
+| `maquinaEspresso` | máquina de espresso | floor | grupo | st.pump |
+| `cabezalEspresso` | cabezal y manómetro | floor | (sin pines) | st.bar |
 | `portafiltro` | portafiltro | floor | (sin pines) |  |
 | `bascula` | báscula | floor | (sin pines) | st.grams, st.shotT |
 | `tazaEspresso` | taza de espresso | floor | (sin pines) | st.grams, st.flowCol |
