@@ -1,78 +1,74 @@
 # SIMULAB
 
-**ES** · Un skill de Claude Code que convierte cualquier idea, de cualquier nicho, en un laboratorio 3D interactivo: una página HTML que se arma sola, explica por capítulos y luego te deja romperla. Cada número en pantalla sale de un modelo con fuentes. Con el mismo código saca un video a 60 fps con sonido.
+Claude Code 技能，可將任何領域的想法轉化為互動式 3D 實驗室：自動生成單一 HTML 頁面，分章節說明，接著讓你動手操作、看看會發生什麼事。畫面上的每個數值都來自有資料來源的模型。同一份程式碼也能輸出含音訊、每秒 60 格的影片。
 
-**EN** · A Claude Code skill that turns any idea, from any niche, into an interactive 3D lab: one HTML page that builds itself, explains in chapters and then lets you break it. Every number on screen comes from one sourced model. The same code renders a 60 fps video with sound.
+![實驗室 E1 · 義式濃縮咖啡：為什麼喝起來會酸或苦](docs/espresso.gif)
 
-![Lab E1 · Espresso: por qué sale agrio o amargo](docs/espresso.gif)
-
-| Café / Coffee | Soldar / Soldering | Multímetro / Multimeter |
+| 咖啡 | 焊接 | 三用電表 |
 |---|---|---|
-| ![Lab E1 Espresso](docs/labE1-espresso.jpg) | ![Lab 03 Cautín](docs/lab03-cautin.jpg) | ![Lab 02 Multímetro](docs/lab02-multimetro.jpg) |
-| **Robótica / Robotics** | **Código / Code** | |
-| ![Lab 01 Sonar](docs/lab01-sonar.jpg) | ![Lab 00 Blink](docs/blink.jpg) | |
+| ![實驗室 E1 義式濃縮咖啡](docs/labE1-espresso.jpg) | ![實驗室 03 烙鐵](docs/lab03-cautin.jpg) | ![實驗室 02 三用電表](docs/lab02-multimetro.jpg) |
+| **機器人** | **程式設計** | |
+| ![實驗室 01 聲納](docs/lab01-sonar.jpg) | ![實驗室 00 閃爍](docs/blink.jpg) | |
 
-## Instalar / Install
+## 安裝
 
 ```
 npx skills add ecapri-dev/simulab-skill -g -a claude-code
 ```
 
-Después, una vez, en la carpeta instalada / Then, once, in the installed folder:
+接著在安裝目錄中執行一次：
 
 ```
 cd ~/.claude/skills/simulab && npm install && pip install -r requirements.txt && npx playwright install chromium
 ```
 
-Necesitas Node.js 20 o más nuevo, Python 3 y Chrome. Para el video, `ffmpeg`.
-You need Node.js 20 or newer, Python 3 and Chrome. For the video, `ffmpeg`.
+你需要 Node.js 20 或更新版本、Python 3 和 Chrome。若要輸出影片，還需要 `ffmpeg`。
 
-## Usar / Use
+## 使用方式
 
-Pídelo con tus palabras / Ask in plain words:
+用自己的話提出需求：
 
-> /simulab Hazme un lab de por qué se rompe el hilo cuando pescas, con el freno del carrete como perilla.
+> /simulab 做一個說明釣魚時魚線為什麼會斷的實驗室，並把捲線器的煞車做成旋鈕。
 
-> /simulab Build a lab on why compound interest matters: coins dropping into jars, starting 5 years earlier.
+> /simulab 做一個說明複利為什麼重要的實驗室：硬幣投入罐子，並比較提早 5 年開始的差異。
 
-> /simulab Quiero un lab de cómo se arma una PC, con cada pieza que se coloca sola y un modo práctica.
+> /simulab 做一個說明如何組裝電腦的實驗室，讓每個零件自動就位，並加入練習模式。
 
-Los prompts paso a paso están en [PROMPTS.md](PROMPTS.md). / Step-by-step prompts are in [PROMPTS.md](PROMPTS.md).
+[PROMPTS.md](PROMPTS.md) 中提供逐步引導的提示詞。
 
-Abre un ejemplo / Open an example:
+開啟範例：
 
 ```
 node tools/build.mjs demos/labE1-espresso    # -> demos/labE1-espresso/dist/index.html
 ```
 
-## El método en 9 pasos / The method in 9 steps
+## 九個步驟
 
-1. La idea en una pregunta con una pieza que se mueve y un número. / The idea as a question with one moving part and one number.
-2. Los números con fuente antes de dibujar; lo demás se marca como supuesto. / Sourced numbers before drawing; the rest is labelled as an assumption.
-3. Primero el modelo: funciones puras de una entrada. / Model first: pure functions of one input.
-4. Los objetos salen de la librería; lo que falte se agrega una vez. / Objects come from the library; anything missing is added once.
-5. Capítulos por contraste: mal, bien, de más. / Chapters by contrast: wrong, right, too much.
-6. Déjalo romperse: una perilla y una tecla. / Let them break it: a knob and a key.
-7. Revisión con hojas de contacto, no de memoria. / Review on contact sheets, not from memory.
-8. Preview y luego video final. / Preview, then the final video.
-9. Un solo archivo de menos de 1 MB. / One file under 1 MB.
+1. 將想法化為一個問題，並包含一個會移動的物件和一個數值。
+2. 繪製前先找好數值來源；其餘內容標示為假設。
+3. 先建立模型：使用單一輸入的純函式。
+4. 物件取自素材庫；缺少的物件只新增一次。
+5. 透過對比安排章節：錯誤、正確、過度。
+6. 讓使用者試著弄壞它：提供一個旋鈕和一個按鍵。
+7. 使用接觸表檢視，不憑記憶判斷。
+8. 先預覽，再輸出最終影片。
+9. 所有內容整合成一個小於 1 MB 的檔案。
 
-Todo el detalle está en [SKILL.md](SKILL.md). / The full detail is in [SKILL.md](SKILL.md).
+詳細說明請參閱 [SKILL.md](SKILL.md)。
 
-## Qué trae / What is inside
+## 專案內容
 
 | | |
 |---|---|
-| `SKILL.md` | Lo que lee Claude: el método, el contrato de cada lab, la revisión. / What Claude reads: the method, the lab contract, the review. |
-| `PROMPTS.md` | Prompts en español e inglés y una tabla de ideas por nicho. / Prompts in Spanish and English and a table of ideas by niche. |
-| `kit/` | Motor isométrico, interfaz, reproductor e idiomas. / Isometric engine, UI, player and languages. |
-| `assets/` | 44 objetos reutilizables (placas, herramientas, café...). Lista en `CATALOGO.md`. / 44 reusable objects (boards, tools, coffee...). List in `CATALOGO.md`. |
-| `demos/` | 5 labs completos y el catálogo. / 5 complete labs and the catalogue. |
-| `tools/` | Build, hojas de contacto, video, audio, portada. / Build, contact sheets, video, audio, cover. |
+| `SKILL.md` | Claude 會讀取的內容：方法、每個實驗室的規範與檢查方式。 |
+| `PROMPTS.md` | 西班牙文和英文提示詞，以及依領域分類的點子清單。 |
+| `kit/` | 等角投影引擎、介面、播放器和語言檔。 |
+| `assets/` | 44 個可重複使用的物件（電路板、工具、咖啡等）。清單請見 `CATALOGO.md`。 |
+| `demos/` | 5 個完整實驗室和素材目錄。 |
+| `tools/` | 建置、接觸表、影片、音訊和封面工具。 |
 
-## Créditos / Credits
+## 致謝
 
-Hecho por [@0xKapri](https://x.com/0xKapri) a partir de su kit KAPRI LAB. Fuentes con SIL Open Font License (`kit/fonts/`).
-Made by [@0xKapri](https://x.com/0xKapri) from the KAPRI LAB kit. Fonts under the SIL Open Font License (`kit/fonts/`).
+由 [@0xKapri](https://x.com/0xKapri) 使用自己的 KAPRI LAB 素材組製作。字型採用 SIL 開放字型授權（`kit/fonts/`）。
 
-Licencia MIT. / MIT licence.
+MIT 授權。
